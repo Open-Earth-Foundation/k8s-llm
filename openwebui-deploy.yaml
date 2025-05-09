@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openwebui-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      containers:
+        - name: openwebui
+          image: ghcr.io/open-webui/open-webui:main
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: openwebui-pvc
+              mountPath: /app/backend/data
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          env:
+            - name: ENABLE_OLLAMA_API
+              value: "true"
+            - name: OLLAMA_BASE_URL
+              value: "http://ollama:11434"
+      volumes:
+        - name: openwebui-pvc
+          persistentVolumeClaim:
+            claimName: openwebui-pvc
